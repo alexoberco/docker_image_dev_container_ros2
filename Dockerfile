@@ -1,5 +1,5 @@
-# Base oficial de ROS 2 Jazzy Desktop (ya incluye RViz2)
-FROM osrf/ros:jazzy-desktop
+# Base oficial de ROS 2 Humble Desktop (ya incluye RViz2)
+FROM osrf/ros:humble-desktop
 
 # Evitar prompts interactivos durante la construcción
 ENV DEBIAN_FRONTEND=noninteractive
@@ -15,10 +15,9 @@ RUN apt-get update && apt-get install -y \
     libgl1-mesa-dri \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Instalar Gazebo Harmonic y la integración con ROS 2
+# 2. Instalar Gazebo Fortress y la integración con ROS 2
 RUN apt-get update && apt-get install -y \
-    ros-jazzy-ros-gz \
-    ros-jazzy-gz-tools-vendor \
+    ros-humble-ros-gz \
     && rm -rf /var/lib/apt/lists/*
 
 # 3. Variables de entorno para habilitar aceleración NVIDIA (si está disponible)
@@ -44,4 +43,4 @@ USER $USERNAME
 WORKDIR /home/$USERNAME/ros2_ws
 
 # 5. Cargar automáticamente el entorno de ROS 2 al abrir la terminal
-RUN echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc

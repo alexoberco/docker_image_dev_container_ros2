@@ -1,16 +1,16 @@
-# ROS 2 Jazzy Desktop + Gazebo Harmonic (DevContainer)
+# ROS 2 Humble Desktop + Gazebo Fortress (DevContainer)
 
-Este repositorio contiene la configuración de un **DevContainer** listo para usar con ROS 2 Jazzy y simulación en Gazebo Harmonic, optimizado para aceleración por hardware (GPU) y entornos visuales (RViz2, Gazebo, etc.).
+Este repositorio contiene la configuración de un **DevContainer** listo para usar con ROS 2 Humble y simulación en Gazebo Fortress, optimizado para aceleración por hardware (GPU) y entornos visuales (RViz2, Gazebo, etc.).
 
 ---
 
 ## 📋 Especificaciones del Entorno
 
-*   **Sistema Operativo Base:** Ubuntu 24.04 LTS (Noble Numbat)
-*   **Versión de ROS 2:** [ROS 2 Jazzy Jalisco (Desktop)](https://docs.ros.org/en/jazzy/index.html) (incluye RViz2, herramientas de desarrollo y demos).
-*   **Simulador:** [Gazebo Harmonic](https://gazebosim.org/docs/harmonic) integrado con ROS 2 (`ros-jazzy-ros-gz` y `ros-jazzy-gz-tools-vendor`).
-*   **Usuario por Defecto:** `ros` (no-root, con privilegios de administrador `sudo` y UID/GID 1000 libre de conflictos).
-*   **Shell:** `bash` por defecto, con el entorno de ROS 2 automáticamente cargado en cada nueva terminal (`source /opt/ros/jazzy/setup.bash`).
+*   **Sistema Operativo Base:** Ubuntu 22.04 LTS (Jammy Jellyfish)
+*   **Versión de ROS 2:** [ROS 2 Humble Hawksbill (Desktop)](https://docs.ros.org/en/humble/index.html) (incluye RViz2, herramientas de desarrollo y demos).
+*   **Simulador:** [Gazebo Fortress](https://gazebosim.org/docs/fortress) integrado con ROS 2 (`ros-humble-ros-gz`).
+*   **Usuario por Defecto:** `ros` (no-root, con privilegios de administrador `sudo` y UID/GID 1000).
+*   **Shell:** `bash` por defecto, con el entorno de ROS 2 automáticamente cargado en cada nueva terminal (`source /opt/ros/humble/setup.bash`).
 *   **Espacio de trabajo:** Montado en la ruta limpia `/home/ros/ros2_ws` dentro del contenedor.
 
 ---
@@ -25,7 +25,7 @@ Si tienes una GPU NVIDIA dedicada, el contenedor ya viene configurado para usarl
 
 #### Requisitos en el Host:
 1. Asegúrate de tener instalado el driver de NVIDIA y el **NVIDIA Container Toolkit**.
-2. despues ejecute estos comandos en la terminal:
+2. Después, ejecuta estos comandos en la terminal de tu host para registrar correctamente el runtime:
    ```bash
    sudo nvidia-ctk runtime configure --runtime=docker
    sudo systemctl restart docker

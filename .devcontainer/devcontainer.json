@@ -1,5 +1,5 @@
 {
-    "name": "ROS 2 Jazzy + Gazebo Harmonic",
+    "name": "ROS 2 Humble + Gazebo Fortress",
     "build": {
         "context": "..",
         "dockerfile": "../Dockerfile"
@@ -35,7 +35,8 @@
                 "files.exclude": {
                     "**/.devcontainer": true,
                     "**/Dockerfile": true,
-                    "**/devcontainer.json": true
+                    "**/devcontainer.json": true,
+                    "**/README.md": true
                 }
             }
         }
