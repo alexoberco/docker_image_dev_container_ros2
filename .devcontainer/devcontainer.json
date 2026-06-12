@@ -22,7 +22,7 @@
     "features": {
         "ghcr.io/devcontainers/features/python:1": {}
     },
-    "postCreateCommand": "sudo apt-get update && sudo apt-get upgrade -y",
+    "postCreateCommand": "sudo apt-get update && sudo apt-get upgrade -y && mkdir src",
     "customizations": {
         "vscode": {
             "extensions": [
