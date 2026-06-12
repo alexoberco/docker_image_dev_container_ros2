@@ -40,7 +40,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
 USER $USERNAME
-WORKDIR /home/$USERNAME/ros2_ws
+WORKDIR /home/$USERNAME/windrobo_development/ros2_ws
 
 # 5. Cargar automáticamente el entorno de ROS 2 al abrir la terminal
 RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc

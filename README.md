@@ -11,7 +11,7 @@ Este repositorio contiene la configuración de un **DevContainer** listo para us
 *   **Simulador:** [Gazebo Fortress](https://gazebosim.org/docs/fortress) integrado con ROS 2 (`ros-humble-ros-gz`).
 *   **Usuario por Defecto:** `ros` (no-root, con privilegios de administrador `sudo` y UID/GID 1000).
 *   **Shell:** `bash` por defecto, con el entorno de ROS 2 automáticamente cargado en cada nueva terminal (`source /opt/ros/humble/setup.bash`).
-*   **Espacio de trabajo:** Montado en la ruta limpia `/home/ros/ros2_ws` dentro del contenedor.
+*   **Espacio de trabajo:** Ubicado en `/home/ros/windrobo_development/ros2_ws` dentro de la carpeta abierta por defecto (`/home/ros/windrobo_development`).
 
 ---
 

@@ -6,8 +6,8 @@
     },
     "remoteUser": "ros",
     // Forzar el espacio de trabajo en la ruta limpia de ROS 2
-    "workspaceMount": "source=${localWorkspaceFolder},target=/home/ros/ros2_ws,type=bind",
-    "workspaceFolder": "/home/ros/ros2_ws",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/ros/windrobo_development,type=bind",
+    "workspaceFolder": "/home/ros/windrobo_development",
     "runArgs": [
         "--network=host",
         "--ipc=host",
@@ -22,7 +22,7 @@
     "features": {
         "ghcr.io/devcontainers/features/python:1": {}
     },
-    "postCreateCommand": "sudo apt-get update && sudo apt-get upgrade -y && mkdir src",
+    "postCreateCommand": "sudo apt-get update && sudo apt-get upgrade -y && sudo mkdir -p /home/ros/windrobo_development/ros2_ws/src && sudo chown -R ros:ros /home/ros/windrobo_development/ros2_ws",
     "customizations": {
         "vscode": {
             "extensions": [
