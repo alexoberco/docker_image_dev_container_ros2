@@ -1,0 +1,11 @@
+# Artefactos de colcon
+**/build/
+**/install/
+**/log/
+__pycache__/
+*.pyc
+
+# El workspace de ROS 2 y sus paquetes viven en su propio repo
+# (ros2_ws/src/sentinel_ros_pkgs); este repo solo provee la infraestructura
+# del devcontainer.
+ros2_ws/

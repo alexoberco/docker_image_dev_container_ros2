@@ -2,6 +2,8 @@
 
 Este repositorio contiene la configuración de un **DevContainer** listo para usar con ROS 2 Jazzy y simulación en Gazebo Harmonic, optimizado para aceleración por hardware (GPU) y entornos visuales (RViz2, Gazebo, etc.).
 
+Es la **infraestructura** del proyecto [Sentinel](https://github.com/alexoberco/sentinel_ros_pkgs) (teleoperación VR de un robot humanoide). El código ROS vive en su propio repo, dentro de `ros2_ws/src/sentinel_ros_pkgs/`, con su propio README: **qué hace el robot se documenta allí, cómo se construye el entorno aquí**.
+
 ---
 
 ## 📋 Especificaciones del Entorno
@@ -56,16 +58,39 @@ Si no tienes una GPU NVIDIA dedicada y deseas usar la gráfica integrada de tu p
 
 ---
 
-## 🛠️ Estructura y Visualización en VS Code
+## 🛠️ Qué se monta y qué se ve dentro del contenedor
 
-Para mantener el entorno limpio, los archivos de configuración del contenedor están ocultos en el explorador de archivos de VS Code dentro de la sesión del contenedor (aunque siguen estando en la carpeta raíz en tu host).
+Del repo **solo se monta `ros2_ws/`**, como `/home/ros/ros2_ws`. Los archivos de infraestructura (Dockerfile, `.devcontainer/`, este README) son cosa del host y **no existen dentro del contenedor**: se usan para construirlo, no para trabajar dentro.
 
-Esta visualización se controla mediante la sección `"settings"` en [.devcontainer/devcontainer.json](file:///.devcontainer/devcontainer.json):
+Consecuencia práctica: el único repo Git visible desde la sesión del contenedor es `src/sentinel_ros_pkgs`, que es justo donde se trabaja. Para tocar la configuración del contenedor hay que abrir esta carpeta en el host, no dentro.
+
+Además se ocultan del explorador de VS Code los artefactos de compilación, que no aportan nada y ensucian la búsqueda — sección `"settings"` de [.devcontainer/devcontainer.json](.devcontainer/devcontainer.json):
 ```json
 "files.exclude": {
-    "**/.devcontainer": true,
-    "**/Dockerfile": true,
-    "**/devcontainer.json": true
+    "build": true,
+    "install": true,
+    "log": true
 }
 ```
-Si alguna vez necesitas modificarlos dentro del contenedor, puedes agregarlos temporalmente comentando estas líneas en la configuración o abriéndolos usando el buscador de archivos de VS Code (`Ctrl + P`).
+
+## 🔌 Preparar el host: la red con el Quest
+
+Lo que no puede vivir en el contenedor (red, USB, NetworkManager) está en [`host/`](host/README.md), versionado aquí para que un PC nuevo quede listo con un comando, una sola vez:
+
+```bash
+host/install.sh        # como tu usuario; pide sudo solo para lo del sistema
+host/quest-status.sh   # diagnóstico
+```
+
+Deja que conectar el Quest por USB-C baste: el casco pasa solo a modo red (CDC-NCM) y el PC queda en `192.168.42.1`, con DHCP, DNS y NAT de NetworkManager. Como el contenedor usa `--network=host`, ROS ve esa red tal cual.
+
+## 🚦 Comprobar que el entorno funciona
+
+Dentro del contenedor, tras *Reopen in Container*:
+
+```bash
+cd ~/ros2_ws && colcon build --symlink-install && source install/setup.bash
+ros2 launch sentinel_description display.launch.py
+```
+
+Si se abre RViz con el robot, el entorno está bien: hay ROS, hay GPU y hay X11. Si RViz no abre, lo primero que hay que mirar es la configuración de GPU de la sección anterior y que el `initializeCommand` (`xhost +local:`) se haya ejecutado en el host.

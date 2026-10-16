@@ -1,27 +1,65 @@
 {
-    "name": "ROS 2 Jazzy + Gazebo Harmonic",
+    "name": "Sentinel Simulation Env (Jazzy + Harmonic)",
     "build": {
         "context": "..",
         "dockerfile": "../Dockerfile"
     },
     "remoteUser": "ros",
-    // Forzar el espacio de trabajo en la ruta limpia de ROS 2
-    "workspaceMount": "source=${localWorkspaceFolder},target=/home/ros/ros2_ws,type=bind",
+    // Se ejecuta EN EL HOST antes de arrancar el contenedor: autoriza conexiones
+    // locales al servidor X. Sin esto, RViz y cualquier GUI mueren con
+    // "Authorization required, but no authorization protocol specified" /
+    // "could not connect to display". Hace falta en cada arranque porque en
+    // Wayland la cookie de Xwayland (.mutter-Xwaylandauth.*) cambia por sesion.
+    "initializeCommand": "xhost +local: > /dev/null 2>&1 || true",
+    // Solo se monta la carpeta ros2_ws. El resto del repo de infraestructura
+    // (Dockerfile, README, .gitignore, .devcontainer) es cosa de infra y NO
+    // existe dentro del contenedor: solo se usa en el host para construirlo.
+    "workspaceMount": "source=${localWorkspaceFolder}/ros2_ws,target=/home/ros/ros2_ws,type=bind",
     "workspaceFolder": "/home/ros/ros2_ws",
     "runArgs": [
         "--network=host",
         "--ipc=host",
         "--privileged",
-        "-e",
-        "DISPLAY=${env:DISPLAY}",
-        "-v",
-        "/tmp/.X11-unix:/tmp/.X11-unix:rw",
-        "--gpus",
-        "all"
+        "-e", "DISPLAY=${env:DISPLAY}",
+        "-v", "/tmp/.X11-unix:/tmp/.X11-unix:rw",
+        // Render por hardware en Intel/AMD (y en NVIDIA como respaldo de Mesa)
+        "--device", "/dev/dri:/dev/dri",
+
+        // =====================================================================
+        // CONFIGURACION DE TARJETA GRAFICA (GPU)
+        // =====================================================================
+        // -> SI SE USA NVIDIA: dejar la linea de abajo activa.
+        //    IMPORTANTE: requiere NVIDIA Container Toolkit en el host.
+        //    Se usa CDI en vez de "--gpus all": con Docker 29 "--gpus all" pide
+        //    TODOS los vendors y falla con "AMD CDI spec not found" si el host
+        //    tiene tambien una iGPU/GPU AMD (/dev/kfd). Requiere haber generado
+        //    la spec: sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+        "--device", "nvidia.com/gpu=all"
+        // -> SI SE USA INTEL / AMD (graficos integrados): comentar la linea de
+        //    arriba ("--gpus", "all") y el contenedor usara los drivers Mesa,
+        //    con los permisos de /dev/dri que arregla el postStartCommand.
+        // =====================================================================
     ],
-    "features": {
-        "ghcr.io/devcontainers/features/python:1": {}
+    "containerEnv": {
+        "DISPLAY": "${localEnv:DISPLAY}",
+        "QT_X11_NO_MITSHM": "1",
+        // Xwayland + Qt: fuerza el backend X11 dentro del contenedor
+        "QT_QPA_PLATFORM": "xcb"
     },
+    "features": {},
+    // 1) Sistema al dia. 2) Estructura del workspace con permisos del usuario ros.
+    // 3) Mapeo de los grupos de /dev/dri del host (render/video) para que la GPU
+    //    integrada funcione dentro del contenedor. 4) Sourcing automatico del
+    //    overlay del workspace en cada terminal.
+    // Solo al crear el contenedor: sistema al dia, estructura del workspace y
+    // sourcing automatico del overlay en cada terminal.
+    "postCreateCommand": "sudo apt-get update && sudo apt-get upgrade -y && sudo mkdir -p /home/ros/ros2_ws/src && sudo chown -R ros:ros /home/ros/ros2_ws && grep -q ros2_ws/install/setup.bash ~/.bashrc || echo 'source /home/ros/ros2_ws/install/setup.bash 2>/dev/null' >> ~/.bashrc",
+    // En CADA arranque: dar acceso a todos los nodos de /dev/dri del host. Los
+    // permisos vienen del host y cambian entre equipos (puede no haber card0, o
+    // haber varias GPUs como card1/card2 + renderD128/renderD129), asi que se
+    // recorren todos en vez de asumir nombres fijos. Sin esto Gazebo llena el log
+    // de 'failed to open /dev/dri/...: Permission denied'.
+    "postStartCommand": "sudo sh -c 'for d in /dev/dri/*; do [ -c \"$d\" ] || continue; g=$(stat -c %g \"$d\"); getent group \"$g\" >/dev/null 2>&1 || groupadd -g \"$g\" \"hostdri$g\"; usermod -aG \"$g\" ros; chmod 666 \"$d\"; done' || true",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -32,10 +70,17 @@
             ],
             "settings": {
                 "terminal.integrated.defaultProfile.linux": "bash",
+                // El unico repo dentro del contenedor es src/sentinel_ros_pkgs;
+                // VS Code lo detecta solo y aparece normal en Source Control.
+                "git.autoRepositoryDetection": true,
+                "terminal.integrated.env.linux": {
+                    "GZ_SIM_RESOURCE_PATH": "/home/ros/ros2_ws/install/sentinel_description/share:/home/ros/ros2_ws/install/sentinel_simulation/share",
+                    "GZ_SIM_SYSTEM_PLUGIN_PATH": "/home/ros/ros2_ws/install/lib:${env:GZ_SIM_SYSTEM_PLUGIN_PATH}"
+                },
                 "files.exclude": {
-                    "**/.devcontainer": true,
-                    "**/Dockerfile": true,
-                    "**/devcontainer.json": true
+                    "build": true,
+                    "install": true,
+                    "log": true
                 }
             }
         }

@@ -1,0 +1,26 @@
+#!/bin/sh
+# Dispatcher de NetworkManager (/etc/NetworkManager/dispatcher.d/): abre el
+# firewall del PC a lo que entra por el cable del Quest.
+#
+# El modo 'shared' del perfil 'quest-usb' ya pone DHCP, DNS, NAT e ip_forward,
+# y abre DHCP y DNS; pero ufw (entrada por defecto denegada) cortaría el resto:
+# el puente ROS-TCP (10000), la señalización WebRTC y el medio UDP. Como el
+# nombre de la interfaz cambia en cada arranque del casco (la MAC del NCM es
+# nueva), la regla se pone aquí, con el nombre real, en vez de en ufw.
+#
+# NetworkManager lo llama como: <script> <interfaz> <acción>
+IFACE="$1"
+ACTION="$2"
+
+[ "$CONNECTION_ID" = "quest-usb" ] || exit 0
+
+case "$ACTION" in
+    up)
+        iptables -C INPUT -i "$IFACE" -j ACCEPT 2>/dev/null ||
+            iptables -I INPUT 1 -i "$IFACE" -j ACCEPT
+        ;;
+    down|pre-down)
+        iptables -D INPUT -i "$IFACE" -j ACCEPT 2>/dev/null || true
+        ;;
+esac
+exit 0

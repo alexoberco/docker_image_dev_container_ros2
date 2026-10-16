@@ -1,0 +1,11 @@
+[Unit]
+Description=Sentinel: poner el Meta Quest en modo red USB (NCM) al conectarlo
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/quest-ncm-watch.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

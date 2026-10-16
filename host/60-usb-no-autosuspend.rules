@@ -1,0 +1,4 @@
+# El autosuspend del controlador USB xHCI hacía desaparecer el Quest de adb y de
+# lsusb a los pocos segundos (visto con un ASMedia ASM4242: "xHC CMD_RUN timeout").
+# Ver skills/meta-quest-adb-usb-setup.
+ACTION=="add", SUBSYSTEM=="pci", DRIVERS=="xhci_hcd", ATTR{power/control}="on"
