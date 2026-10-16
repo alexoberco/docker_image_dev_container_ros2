@@ -24,6 +24,11 @@ RUN apt-get update && apt-get install -y \
     # minimal_displacement_weight, asi que en teleoperacion salta entre soluciones
     # de codo; pick_ik si lo tiene. Tampoco viene en el metapaquete.
     ros-jazzy-pick-ik \
+    # TRAC-IK: el moveit_config lo ofrece como solver alternativo a pick_ik.
+    ros-jazzy-trac-ik-kinematics-plugin \
+    # Cabeceras de NVENC: sin ellas no compila el plugin de vídeo en la GPU
+    # (sntv_gazebo, sentinel_eye_stream). La biblioteca la pone el driver.
+    libffmpeg-nvenc-dev \
     python3-colcon-common-extensions \
     python3-pip \
     python3-dev \
