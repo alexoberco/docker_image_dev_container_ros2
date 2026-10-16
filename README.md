@@ -26,16 +26,14 @@ El contenedor está configurado por defecto para utilizar aceleración gráfica 
 Si tienes una GPU NVIDIA dedicada, el contenedor ya viene configurado para usarla. 
 
 #### Requisitos en el Host:
-1. Asegúrate de tener instalado el driver de NVIDIA y el **NVIDIA Container Toolkit**.
-2. despues ejecute estos comandos en la terminal:
+1. Driver de NVIDIA ([guía de Ubuntu](https://documentation.ubuntu.com/server/how-to/graphics/install-nvidia-drivers/)) y **NVIDIA Container Toolkit** ([instalación](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)).
+2. El contenedor pide la GPU por **CDI** (`"--device", "nvidia.com/gpu=all"` en `runArgs`), así que hay que generar la spec ([CDI](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/cdi-support.html)) y configurar Docker:
    ```bash
+   sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
    sudo nvidia-ctk runtime configure --runtime=docker
    sudo systemctl restart docker
    ```
-3. En [.devcontainer/devcontainer.json](file:///.devcontainer/devcontainer.json), la sección `runArgs` debe mantener la directiva:
-   ```json
-   "--gpus", "all"
-   ```
+   Se usa CDI y no `--gpus all` porque con Docker 29 `--gpus all` pide todos los fabricantes y falla (`AMD CDI spec not found`) si el PC tiene además una GPU AMD integrada. Tras actualizar el driver, vuelve a generar la spec.
 
 ---
 
