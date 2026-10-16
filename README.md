@@ -2,7 +2,7 @@
 
 Este repositorio contiene la configuración de un **DevContainer** listo para usar con ROS 2 Jazzy y simulación en Gazebo Harmonic, optimizado para aceleración por hardware (GPU) y entornos visuales (RViz2, Gazebo, etc.).
 
-Es la **infraestructura** del proyecto [Sentinel](https://github.com/alexoberco/sentinel_ros_pkgs) (teleoperación VR de un robot humanoide). El código ROS vive en su propio repo, dentro de `ros2_ws/src/sentinel_ros_pkgs/`, con su propio README: **qué hace el robot se documenta allí, cómo se construye el entorno aquí**.
+Esta rama (`sentinel`) es la **infraestructura** del proyecto Sentinel (teleoperación VR de un robot humanoide): la imagen y la preparación del host ([`host/`](host/README.md)). En Sentinel este repo es un submódulo del monorrepo del proyecto, que tiene su propio `.devcontainer/` con esta imagen, monta los paquetes ROS (otro repo) como `src/` y guarda el workspace en un volumen de Docker. Usado solo, el `.devcontainer/` de aquí monta `ros2_ws/` de esta carpeta, que no se versiona. **Qué hace el robot se documenta en los paquetes; cómo se construye el entorno, aquí**.
 
 ---
 
